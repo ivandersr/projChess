@@ -1,5 +1,6 @@
 package application;
 
+import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.InputMismatchException;
 import java.util.List;
@@ -33,6 +34,8 @@ public class UI {
 	public static final String ANSI_PURPLE_BACKGROUND = "\u001B[45m";
 	public static final String ANSI_CYAN_BACKGROUND = "\u001B[46m";
 	public static final String ANSI_WHITE_BACKGROUND = "\u001B[47m";
+	
+	private static PrintStream out = null;
 
 	// https://stackoverflow.com/questions/2979383/java-clear-the-console
 	public static void clearScreen() {
@@ -80,7 +83,7 @@ public class UI {
 		System.out.println("  a b c d e f g h");
 	}
 	
-	public static void printboard(ChessPiece[][] pieces, boolean[][] possibleMoves) {
+	public static void printBoard(ChessPiece[][] pieces, boolean[][] possibleMoves) {
 		for (int i = 0; i < pieces.length; i++) {
 			System.out.print((8 - i) + " ");
 			for (int j = 0; j < pieces.length; j++) {
@@ -99,11 +102,16 @@ public class UI {
 		if (piece == null) {
 			System.out.print("-" + ANSI_RESET);
 		} else {
-			if (piece.getColor() == Color.WHITE) {
-				System.out.print(ANSI_WHITE + piece + ANSI_RESET);
-			} else {
-				System.out.print(ANSI_YELLOW + piece + ANSI_RESET);
-			}
+			try {
+				out = new PrintStream(System.out, true, "UTF-8");
+				if (piece.getColor() == Color.WHITE) {
+					out.print(ANSI_WHITE + piece + ANSI_RESET);
+				} else {
+					out.print(ANSI_YELLOW + piece + ANSI_RESET);
+				}
+			} catch (Exception e) {
+				e.printStackTrace();
+			}	
 
 		}
 		System.out.print(" ");
@@ -112,7 +120,7 @@ public class UI {
 	private static void printCapturedPieces(List<ChessPiece> captured) {
 		List<ChessPiece> white = captured.stream().filter(x -> x.getColor() == Color.WHITE).collect(Collectors.toList());
 		List<ChessPiece> black = captured.stream().filter(x -> x.getColor() == Color.BLACK).collect(Collectors.toList());
-		System.out.println("CapturedPieces:");
+		System.out.println("Captured Pieces:");
 		System.out.print("White: ");
 		System.out.print(ANSI_WHITE);
 		System.out.print(Arrays.toString(white.toArray()));
